@@ -6,15 +6,17 @@ package Date;
 public class Date {
 
     /**
-     * 
+     * Class which contains methods useful for working with dates, which relate to validating, and formatting
+     * numbers or dates.
      */
     public static final class DateUtilMethods {
-        private static final int DAYSINMONTH[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        private static final int DAYSINMONTH[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }; // Array contains numbers of days in each month of the year
 
         /**
+         * Check if the parsed number is a valid month
          * 
-         * @param month
-         * @return
+         * @param month the number to be checked.
+         * @return true if month is valid, else false.
          */
         public static boolean isValidMonth(int month) {
             if (month < 1 || month > 12)
@@ -23,26 +25,28 @@ public class Date {
         }
 
         /**
+         * Checks if a day is valid for the parsed month and year.
          * 
-         * @param day
-         * @param month
-         * @param year
-         * @return
+         * @param day the day of month to be checked.
+         * @param month the month in which the day occurs.
+         * @param year the year the day occurs in; needed for leap year edge case
+         * @return false if day is invalid, else true
          */
         public static boolean isValidDayForMonth(int day, int month, int year) {
-            if (day <= 0)
-                return false;
             if (day < 1 || day > 31)
                 return false;
+            // Check for leap year Feb edge case
             if (month == 2 && isLeapYear(year))
                 return day <= 29;
+            // Check if day is less than number of days in month 
             return DAYSINMONTH[month] >= day;
         }
 
         /**
+         * Detects wether the parsed year is a leap year or not
          * 
-         * @param year
-         * @return
+         * @param year the year to be checked
+         * @return true if leap year else false
          */
         public static boolean isLeapYear(int year) {
             if (!isWholeNumber(year / 4.0))
@@ -90,27 +94,30 @@ public class Date {
         }
 
         /**
-         * Simple function to check if a number requires
+         * Simple function to add leading zeros to a number to get it to reach a 
+         * defined length
          * 
-         * @param num
-         * @return
+         * @param num the number to add leading zeros to.
+         * @param expectedLength length number should be.
+         * @return String of length expected length, is value of num with leading zeros.
          */
         public static String getLeadingZeroString(int num, int expectedLength) {
-            String leadingZeros = "";
+            StringBuilder leadingZeros = new StringBuilder();
             for (int i = 10; i <= Math.pow(i, expectedLength); i *= 10) {
                 if (num < i) {
-                    leadingZeros.concat("0");
+                    leadingZeros.append("0");
                 }
             }
-            return leadingZeros;
+            leadingZeros.append(Integer.toString(num));
+            return leadingZeros.toString();
         }
 
         /**
-         * 
+         * Simple functions to decide if a number needs leading zeros.
          * @param num
          * @return
          */
-        public static boolean needsLeadingZero(int num) {
+        public static boolean needsLeadingZero(int num, int expectedLength) {
             return num < 10;
         }
 
@@ -162,6 +169,9 @@ public class Date {
     }
 
     /**
+     * Method will accept a string and replace defined characters with the
+     * associated characters below. 
+     * 
      * d - The day of the month (from 01 to 31)
      * D - A textual representation of a day (three letters)
      * j - The day of the month without leading zeros (1 to 31)
@@ -180,11 +190,11 @@ public class Date {
      * Y - A four digit representation of a year
      * y - A two digit representation of a year
      * 
-     * @param format
-     * @return
+     * @param format the string containing parts to be replaced
+     * @return the completely formated string containing replaced elements
      */
     public String getDate(String format) {
-        return format.replace("d", DateUtilMethods.needsLeadingZero(this.day) ? "0" + this.day : "" + this.day) //
+        return format.replace("d", DateUtilMethods.getLeadingZeroString(this.day,2)) //
                 .replace("D", this.getDayOfWeek().substring(0, 3)) //
                 .replace("j", Integer.toString(this.day))
                 .replace("l", this.getDayOfWeek())
