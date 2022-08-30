@@ -1,2 +1,2 @@
 # Java-Date
-This is a package used to create, store, and work with dates in java.
+This is a package used for handling the creation, storage, and for working with with non-unix, human interpretable dates without time in java.
