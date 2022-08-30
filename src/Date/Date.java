@@ -69,22 +69,40 @@ public class Date {
         }
 
         /**
+         * Used to identify if a double is a whole number or not.
          * 
-         * @param num
-         * @return
+         * @param num the number being checked
+         * @return true if whole number, else false
          */
         private static boolean isWholeNumber(double num) {
             return num - (int) num == 0 ? true : false;
         }
 
         /**
+         * Converts the parsed integer to it's ordinal counterpart.
+         * 
+         * @param num the number to be converted to ordinal.
+         * @return the parsed values ordinal counterpart
+         */
+        public static String getOrdinal(int num) {
+            String ordinals[] = { "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th" };
+            return num + ordinals[num % 10];
+        }
+
+        /**
+         * Simple function to check if a number requires
          * 
          * @param num
          * @return
          */
-        public static String getOrdinal(int num) {
-            String ordinals[] = { "th", "st", "nd", "rd", "th", "th", "th", "th", "th" };
-            return num + ordinals[num % 9];
+        public static String getLeadingZeroString(int num, int expectedLength) {
+            String leadingZeros = "";
+            for (int i = 10; i <= Math.pow(i, expectedLength); i *= 10) {
+                if (num < i) {
+                    leadingZeros.concat("0");
+                }
+            }
+            return leadingZeros;
         }
 
         /**
@@ -131,10 +149,16 @@ public class Date {
      * @return
      */
     public String getDate() {
-        String day = DateUtilMethods.needsLeadingZero(this.day) ? "0" + this.day : "" + this.day;
-        String month = DateUtilMethods.needsLeadingZero(this.month) ? "0" + this.month : "" + this.month;
-        String year = DateUtilMethods.needsLeadingZero(this.year) ? "0" + this.year : "" + this.year;
-        return day + "-" + month + "-" + year;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DateUtilMethods.getLeadingZeroString(this.day, 2));
+        stringBuilder.append(this.day);
+        stringBuilder.append("-");
+        stringBuilder.append(DateUtilMethods.getLeadingZeroString(this.month, 2));
+        stringBuilder.append(this.month);
+        stringBuilder.append("-");
+        stringBuilder.append(DateUtilMethods.getLeadingZeroString(this.year, 4));
+        stringBuilder.append(this.year);
+        return stringBuilder.toString();
     }
 
     /**
@@ -143,9 +167,8 @@ public class Date {
      * j - The day of the month without leading zeros (1 to 31)
      * l (lowercase 'L') - A full textual representation of a day
      * N - The ISO-8601 numeric representation of a day (1 for Monday, 7 for Sunday)
-     * S - The English ordinal suffix for the day of the month (2 characters st, nd,
-     * rd or th. Works well with j)
-     * w - A numeric representation of the day (0 for Sunday, 6 for Saturday)
+     * S - The day of the month with an ordinal suffix (e.g. 1st, 22nd, 23rd, 14th)
+     * w - Numeric representation of the day (0 is Monday, 6 for Sunday)
      * z - The day of the year (from 0 through 365)
      * F - A full textual representation of a month (January through December)
      * m - A numeric representation of a month (from 01 to 12)
@@ -161,13 +184,15 @@ public class Date {
      * @return
      */
     public String getDate(String format) {
-        return format.replace("d",  DateUtilMethods.needsLeadingZero(this.day) ? "0" + this.day : "" + this.day) //
+        return format.replace("d", DateUtilMethods.needsLeadingZero(this.day) ? "0" + this.day : "" + this.day) //
                 .replace("D", this.getDayOfWeek().substring(0, 3)) //
-                .replace("j", this.day + "")
+                .replace("j", Integer.toString(this.day))
                 .replace("l", this.getDayOfWeek())
                 .replace("N", this.getDayOfWeek())
-                .replace("Y", this.year + "")
-                .replace("n", this.month + "");
+                .replace("S", DateUtilMethods.getOrdinal(this.day))
+                .replace("w", Integer.toString(this.getDayOfWeekIndex()))
+                .replace("Y", Integer.toString(this.year))
+                .replace("n", Integer.toString(this.month));
     }
 
     /**
@@ -243,6 +268,14 @@ public class Date {
     public String getDayOfWeek() {
         int dayIndex = this.getDayOfWeekIndex();
         return days[dayIndex];
+    }
+
+    public int getDayOfYear() {
+        int dayOfYear = 0;
+        for (int i = 1; i < this.month; i++)
+            dayOfYear += DateUtilMethods.getNumberOfDaysInMonth(i - 1, this.year);
+        dayOfYear += this.day;
+        return dayOfYear;
     }
 
 }
